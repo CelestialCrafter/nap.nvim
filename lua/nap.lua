@@ -14,9 +14,9 @@ local M = {}
 
 -- Record the last operation.
 ---@type Command
-local _next = nil
+M._next = nil
 ---@type Command
-local _prev = nil
+M._prev = nil
 
 ---@param command Command
 local function replay(command)
@@ -41,8 +41,8 @@ local function map_nap(mode, next, prev)
     opts.expr = type(command.rhs) == "string" or (opts.expr or false)
 
     vim.keymap.set(mode, command.lhs, function()
-      _next = next
-      _prev = prev
+      M._next = next
+      M._prev = prev
       if type(command.rhs) == "string" then
         return command.rhs
       else
@@ -75,9 +75,9 @@ end
 
 -- APIs to allow repeating manually.
 
-function M.repeat_last_next() replay(_next) end
+function M.repeat_last_next() replay(M._next) end
 
-function M.repeat_last_prev() replay(_prev) end
+function M.repeat_last_prev() replay(M._prev) end
 
 -- File operator.
 
@@ -281,8 +281,8 @@ M.defaults = {
 function M.setup(options)
   M.options = vim.tbl_deep_extend("force", {}, M.defaults, options or {})
 
-  vim.keymap.set({ "n", "x", "o" }, M.options.next_repeat, function() replay(_next) end, { desc = "Repeat next" })
-  vim.keymap.set({ "n", "x", "o" }, M.options.prev_repeat, function() replay(_prev) end, { desc = "Repeat prev" })
+  vim.keymap.set({ "n", "x", "o" }, M.options.next_repeat, function() replay(M._next) end, { desc = "Repeat next" })
+  vim.keymap.set({ "n", "x", "o" }, M.options.prev_repeat, function() replay(M._prev) end, { desc = "Repeat prev" })
 
   if M.options.exclude_default_operators ~= true then
     -- buld a table for search speed
